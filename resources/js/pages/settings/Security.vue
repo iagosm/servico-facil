@@ -126,7 +126,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                                 v-show="recentlySuccessful"
                                 class="text-sm text-neutral-600"
                             >
-                                Saved.
+                                Atualizado.
                             </p>
                         </Transition>
                     </div>

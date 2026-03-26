@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['nome', 'descricao', 'sku', 'quantidade', 'quantidade_minima', 'preco_custo', 'preco_venda'])]
 class Estoque extends Model
 {
-//     protected $fillable = [
-//     'nome', 'descricao', 'sku',
-//     'quantidade', 'quantidade_minima',
-//     'preco_custo', 'preco_venda',
-// ];
-
+  protected $table = 'estoque';
   protected $casts = [
       'preco_custo' => 'decimal:2',
       'preco_venda' => 'decimal:2',
