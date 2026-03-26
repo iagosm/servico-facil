@@ -18,7 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->foreignId('estoque_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('estoque')
                 ->nullOnDelete();
             $table->string('descricao', 150);
             $table->integer('quantidade')->default(1);
