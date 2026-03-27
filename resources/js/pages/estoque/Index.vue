@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import GenericTable from '@/components/tables/GenericTable.vue';
-import ClienteForm, { type Cliente as EstoqueForm } from '@/components/cliente/ClienteForm.vue';
+import EstoqueForm, { type Estoque } from '@/components/estoque/EstoqueForm.vue';
 import { Spinner } from '@/components/ui/spinner';
 import {
     Dialog,
@@ -37,8 +37,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const columns = [
     { key: 'nome', header: 'Nome' },
-    { key: 'email', header: 'Email' },
-    { key: 'telefone', header: 'Telefone' },
+    { key: 'sku', header: 'SKU' },
+    { key: 'quantidade', header: 'Quantidade' },
+    { key: 'quantidade_minima', header: 'Mínimo' },
+    { key: 'preco_custo', header: 'Custo' },
+    { key: 'preco_venda', header: 'Venda' },
     { key: 'actions', header: 'Ações' },
 ];
 
@@ -50,10 +53,10 @@ const openCreate = () => {
     activePane.value = 'create';
 };
 
-const openEdit = (cliente: any) => {
-    selectedCliente.value = cliente as Cliente;
-    activePane.value = 'edit';
-};
+// const openEdit = (cliente: any) => {
+//     selectedCliente.value = cliente as Cliente;
+//     activePane.value = 'edit';
+// };
 
 const backToList = () => {
     activePane.value = 'list';
@@ -130,7 +133,7 @@ const backToList = () => {
                                     <DialogContent>
                                         <DialogHeader class="space-y-2">
                                             <DialogTitle>
-                                                Excluir cliente?
+                                                Excluir item do estoque?
                                             </DialogTitle>
                                             <DialogDescription>
                                                 Esta ação não pode ser desfeita.
@@ -138,7 +141,7 @@ const backToList = () => {
                                         </DialogHeader>
 
                                         <Form
-                                            :action="`/clientes/${row.id}?_method=DELETE`"
+                                            :action="`/estoque/${row.id}?_method=DELETE`"
                                             method="post"
                                             class="space-y-6"
                                             @success="backToList"
@@ -176,7 +179,7 @@ const backToList = () => {
                 </div>
 
                 <div v-else-if="activePane === 'create'">
-                    <ClienteForm
+                    <EstoqueForm
                         mode="create"
                         :key="'create-pane'"
                         @cancel="backToList"
@@ -184,7 +187,7 @@ const backToList = () => {
                 </div>
 
                 <div v-else-if="activePane === 'edit'">
-                    <ClienteForm
+                    <EstoqueForm
                         mode="edit"
                         :cliente="selectedCliente"
                         :key="selectedCliente?.id ?? 'edit-null'"

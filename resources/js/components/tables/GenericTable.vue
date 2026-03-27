@@ -35,11 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
             </thead>
             <tbody>
                 <tr v-if="rows.length === 0">
-                    <td
-                        class="px-4 py-4 text-muted-foreground"
-                        :colspan="columns.length"
-                    >
-                        {{ emptyMessage }}
+                    <td :colspan="columns.length">
+                        <div class="flex justify-center items-center py-6 text-muted-foreground">
+                            {{ emptyMessage }}
+                        </div>
                     </td>
                 </tr>
 
