@@ -13,13 +13,17 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-              $table->foreignId('estoque_id')
-                ->nullable()
-                ->constrained('estoque')
-                ->nullOnDelete();
+            $table->foreignId('estoque_id')->nullable()->constrained('estoque')->nullOnDelete();
+            $table->foreignId('fornecedor_id')->nullable()->constrained('fornecedores')->nullOnDelete();
+            $table->foreignId('solicitado_por')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('recebido_por')->nullable()->constrained('users')->nullOnDelete();
             $table->string('descricao', 150);
             $table->integer('quantidade')->default(1);
+            $table->decimal('preco_unitario', 10, 2)->nullable();
             $table->string('status', 20)->default('pendente');
+            $table->date('data_solicitacao')->nullable();
+            $table->date('data_pedido')->nullable();
+            $table->date('data_recebimento')->nullable();
             $table->text('observacao')->nullable();
             $table->timestamps();
         });

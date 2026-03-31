@@ -12,8 +12,45 @@ class Pedido extends Model
 //     'quantidade', 'status', 'observacao',
 // ];
 
-public function estoque(): BelongsTo
-{
-    return $this->belongsTo(Estoque::class);
-}
+protected $fillable = [
+        'estoque_id',
+        'fornecedor_id',
+        'solicitado_por',
+        'recebido_por',
+        'descricao',
+        'quantidade',
+        'preco_unitario',
+        'status',
+        'data_solicitacao',
+        'data_pedido',
+        'data_recebimento',
+        'observacao',
+    ];
+
+    protected $casts = [
+        'data_solicitacao' => 'date',
+        'data_pedido'      => 'date',
+        'data_recebimento' => 'date',
+        'preco_unitario'   => 'decimal:2',
+    ];
+
+    public function estoque()
+    {
+        return $this->belongsTo(Estoque::class);
+    }
+
+    public function fornecedor()
+    {
+        return $this->belongsTo(Fornecedor::class);
+    }
+
+    public function solicitadoPor()
+    {
+        return $this->belongsTo(User::class, 'solicitado_por');
+    }
+
+    public function recebidoPor()
+    {
+        return $this->belongsTo(User::class, 'recebido_por');
+    }
 }

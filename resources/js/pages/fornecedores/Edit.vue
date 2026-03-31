@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { BreadcrumbItem } from '@/types';
 
-type Fornecedor = {
+type Cliente = {
     id: number;
     nome: string;
     telefone: string;
@@ -22,30 +22,30 @@ type Fornecedor = {
 };
 
 type Props = {
-    fornecedor: Fornecedor;
+    cliente: Cliente;
 };
 
 defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'fornecedores', href: '/fornecedores' },
+    { title: 'Clientes', href: '/clientes' },
     { title: 'Editar', href: '#' },
 ];
 </script>
 
 <template>
-    <Head title="Editar fornecedor" />
+    <Head title="Editar Cliente" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <Heading
                 variant="small"
-                title="Editar fornecedor"
-                description="Atualize os dados do fornecedor."
+                title="Editar Cliente"
+                description="Atualize os dados do cliente."
             />
 
             <Form
-                :action="`/fornecedores/${fornecedor.id}?_method=PATCH`"
+                :action="`/clientes/${cliente.id}?_method=PATCH`"
                 method="post"
                 class="mt-6 space-y-6"
                 v-slot="{ errors, processing }"
@@ -58,7 +58,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             name="nome"
                             type="text"
                             required
-                            :default-value="fornecedor.nome"
+                            :default-value="cliente.nome"
                         />
                         <InputError :message="errors.nome" />
                     </div>
@@ -70,7 +70,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             name="telefone"
                             type="text"
                             required
-                            :default-value="fornecedor.telefone"
+                            :default-value="cliente.telefone"
                         />
                         <InputError :message="errors.telefone" />
                     </div>
@@ -81,7 +81,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="email"
                             name="email"
                             type="email"
-                            :default-value="fornecedor.email || ''"
+                            :default-value="cliente.email || ''"
                         />
                         <InputError :message="errors.email" />
                     </div>
@@ -92,7 +92,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="documento"
                             name="documento"
                             type="text"
-                            :default-value="fornecedor.documento || ''"
+                            :default-value="cliente.documento || ''"
                         />
                         <InputError :message="errors.documento" />
                     </div>
@@ -103,7 +103,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="endereco"
                             name="endereco"
                             type="text"
-                            :default-value="fornecedor.endereco || ''"
+                            :default-value="cliente.endereco || ''"
                         />
                         <InputError :message="errors.endereco" />
                     </div>
@@ -114,7 +114,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="cidade"
                             name="cidade"
                             type="text"
-                            :default-value="fornecedor.cidade || ''"
+                            :default-value="cliente.cidade || ''"
                         />
                         <InputError :message="errors.cidade" />
                     </div>
@@ -125,7 +125,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="estado"
                             name="estado"
                             type="text"
-                            :default-value="fornecedor.estado || ''"
+                            :default-value="cliente.estado || ''"
                         />
                         <InputError :message="errors.estado" />
                     </div>
@@ -136,7 +136,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="cep"
                             name="cep"
                             type="text"
-                            :default-value="fornecedor.cep || ''"
+                            :default-value="cliente.cep || ''"
                         />
                         <InputError :message="errors.cep" />
                     </div>
@@ -147,7 +147,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             id="observacoes"
                             name="observacoes"
                             rows="4"
-                            :value="fornecedor.observacoes || ''"
+                            :value="cliente.observacoes || ''"
                             class="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                         ></textarea>
                         <InputError :message="errors.observacoes" />
@@ -163,7 +163,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         variant="secondary"
                         :disabled="processing"
                     >
-                        <Link :href="`/fornecedores`">Cancelar</Link>
+                        <Link :href="`/clientes`">Cancelar</Link>
                     </Button>
                 </div>
             </Form>
