@@ -3,16 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pedido extends Model
 {
-//     protected $fillable = [
-//     'estoque_id', 'descricao',
-//     'quantidade', 'status', 'observacao',
-// ];
-
-protected $fillable = [
+    protected $fillable = [
         'estoque_id',
         'fornecedor_id',
         'solicitado_por',
@@ -21,8 +15,10 @@ protected $fillable = [
         'quantidade',
         'preco_unitario',
         'status',
+        'numero_pedido',
         'data_solicitacao',
         'data_pedido',
+        'data_previsao',
         'data_recebimento',
         'observacao',
     ];
@@ -30,9 +26,17 @@ protected $fillable = [
     protected $casts = [
         'data_solicitacao' => 'date',
         'data_pedido'      => 'date',
+        'data_previsao'    => 'date',
         'data_recebimento' => 'date',
         'preco_unitario'   => 'decimal:2',
     ];
+
+    public function getAtrasadoAttribute(): bool
+    {
+        return $this->status === 'pedido'
+            && $this->data_previsao !== null
+            && $this->data_previsao->isPast();
+    }
 
     public function estoque()
     {

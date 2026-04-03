@@ -20,18 +20,17 @@ return new class extends Migration
             $table->string('descricao', 150);
             $table->integer('quantidade')->default(1);
             $table->decimal('preco_unitario', 10, 2)->nullable();
-            $table->string('status', 20)->default('pendente');
+            $table->enum('status', ['pendente', 'pedido', 'recebido', 'cancelado'])->default('pendente');
+            $table->string('numero_pedido', 60)->nullable();
             $table->date('data_solicitacao')->nullable();
             $table->date('data_pedido')->nullable();
+            $table->date('data_previsao')->nullable();
             $table->date('data_recebimento')->nullable();
             $table->text('observacao')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pedidos');
