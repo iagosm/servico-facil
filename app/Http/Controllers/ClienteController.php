@@ -37,10 +37,12 @@ class ClienteController extends Controller
             'documento' => ['nullable', 'string', 'max:20'],
             'observacoes' => ['nullable', 'string'],
         ]);
-
-        Cliente::query()->create($validated);
-
-        return to_route('clientes.index');
+        try {
+          Cliente::query()->create($validated);
+           return to_route('clientes.index')->with('sucesso', 'Cliente cadastrado com sucesso!');
+        } catch (\Throwable $th) {
+           return to_route('clientes.index')->with('erro', 'Erro ao cadastrar cliente. Tente novamente.');
+        }
     }
 
     public function edit(Cliente $cliente): Response
@@ -63,13 +65,24 @@ class ClienteController extends Controller
             'documento' => ['nullable', 'string', 'max:20'],
             'observacoes' => ['nullable', 'string'],
         ]);
-        $cliente->update($validated);
-        return to_route('clientes.index');
+        try {
+          $cliente->update($validated);
+          return to_route('clientes.index')->with('sucesso', 'Cliente atualizado com sucesso!');
+        } catch (\Throwable $th) {
+           return to_route('clientes.index')->with('erro', 'Erro ao atualizado cliente. Tente novamente.');
+        }
     }
 
     public function destroy(Cliente $cliente): RedirectResponse
     {
+      try {
+        
         $cliente->delete();
-        return to_route('clientes.index');
+         return to_route('clientes.index')
+                ->with('sucesso', 'Cliente removido com sucesso!');
+      } catch (\Throwable $th) {
+        return to_route('clientes.index')
+                ->with('erro', 'Erro ao remover cliente. Tente novamente.');
+      }
     }
 }

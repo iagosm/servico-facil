@@ -25,8 +25,8 @@ export type Supervisor = {
 
 type Props = {
     mode: 'create' | 'edit';
-    cliente?: Equipe | null;
-     supervisores?: { id: number; name: string }[];
+    equipe?: Equipe | null;
+    supervisores?: { id: number; name: string }[];
 };
 
 const props = defineProps<Props>();
@@ -34,12 +34,13 @@ const emit = defineEmits<{
     cancel: [];
 }>();
 
+console.log('Props recebidas:', props);
 const actionUrl = props.mode === 'create'
     ? '/equipe'
-    : `/equipe/${props.cliente?.id}?_method=PATCH`;
+    : `/equipe/${props.equipe?.id}?_method=PATCH`;
 
 const submitLabel = props.mode === 'create' ? 'Salvar' : 'Atualizar';
-const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador';
+const title = props.mode === 'create' ? 'Novo Membro' : 'Editar Membro';
 </script>
 
 <template>
@@ -63,7 +64,7 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
                     type="text"
                     required
                     placeholder="Nome do colaborador"
-                    :default-value="cliente?.name ?? ''"
+                    :default-value="equipe?.name ?? ''"
                 />
                 <InputError :message="errors.name" />
             </div>
@@ -77,7 +78,7 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
                     type="email"
                     required
                     placeholder="usuario@email.com"
-                    :default-value="cliente?.email ?? ''"
+                    :default-value="equipe?.email ?? ''"
                 />
                 <InputError :message="errors.email" />
             </div>
@@ -91,7 +92,7 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
                     type="text"
                     required
                     placeholder="Cargo do colaborador"
-                    :default-value="cliente?.cargo ?? ''"
+                    :default-value="equipe?.cargo ?? ''"
                 />
                 <InputError :message="errors.cargo" />
             </div>
@@ -105,7 +106,7 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
                     type="text"
                     required
                     placeholder="(XX) XXXX-XXXX"
-                    :default-value="cliente?.telefone ?? ''"
+                    :default-value="equipe?.telefone ?? ''"
                 />
                 <InputError :message="errors.telefone" />
             </div>
@@ -117,7 +118,7 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
                     id="supervisor_id"
                     name="supervisor_id"
                     class="border rounded px-2 py-1"
-                    :value="cliente?.supervisor_id ?? ''"
+                    :value="equipe?.supervisor_id ?? ''"
                     required
                 >
                     <option value="">Selecione</option>
@@ -134,13 +135,12 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
 
             <!-- Senha -->
             <div class="grid gap-2">
-                <Label for="senha">Senha</Label>
+                <Label for="password">Senha</Label>
                 <Input
-                    id="senha"
-                    name="senha"
+                    id="password"
+                    name="password"
                     type="password"
                     placeholder="Senha de acesso"
-                    :default-value="cliente?.senha ?? ''"
                 />
                 <InputError :message="errors.senha" />
             </div>
@@ -148,13 +148,17 @@ const title = props.mode === 'create' ? 'Novo Colaborador' : 'Editar Colaborador
             <!-- Ativo -->
             <div class="grid gap-2">
                 <Label for="ativo">Ativo</Label>
-                <Input
+                <select
                     id="ativo"
                     name="ativo"
-                    type="text"
-                    placeholder="Sim / Não"
-                    :default-value="cliente?.ativo ?? 'Sim'"
-                />
+                    class="border rounded px-2 py-1"
+                    :value="equipe?.ativo == 'Sim' ? 'S' : 'N'"
+                    required
+                >
+                    <option value="">Selecione</option>
+                    <option value="S">Sim</option>
+                    <option value="N">Não</option>
+                </select>
                 <InputError :message="errors.ativo" />
             </div>
         </div>
