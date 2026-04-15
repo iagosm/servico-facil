@@ -31,8 +31,12 @@ class FornecedorController extends Controller
             'observacoes'      => 'required|string',
             'ativo'      => 'required|string',
         ]);
-        Fornecedor::query()->create($request->all());
-        return to_route('fornecedores.index');
+        try {
+          Fornecedor::query()->create($request->all());
+          return to_route('fornecedores.index')->with('sucesso', 'Fornecedor criado com sucesso!');
+        } catch (\Throwable $th) {
+          return to_route('fornecedores.index')->with('erro', 'Erro ao criar fornecedor criado com sucesso!');
+        }
     }
 
     // public function show(Fornecedor $fornecedor)
@@ -56,13 +60,21 @@ class FornecedorController extends Controller
             'observacoes'      => 'required|string',
             'ativo'      => 'required|string',
         ]);
-        $fornecedor->update($validated);
-        return to_route('fornecedores.index');
+        try {
+          $fornecedor->update($validated);
+          return to_route('fornecedores.index')->with('sucesso', 'Fornecedor atualizado com sucesso!');
+        } catch (\Throwable $th) {
+          return to_route('fornecedores.index')->with('erro', 'Erro ao atualizar o fornecedor. Tente novamente');
+        }
     }
 
     public function destroy(Fornecedor $fornecedor)
     {
+      try {
         $fornecedor->delete();
-        return to_route('fornecedores.index');
+        return to_route('fornecedores.index')->with('sucesso', 'Fornecedor removido com sucesso');
+      } catch (\Throwable $th) {
+        return to_route('fornecedores.index')->with('erro', 'Erro ao remover fornecedor. Tente novamente');
+      }
     }
 }

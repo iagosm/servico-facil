@@ -18,7 +18,6 @@ class EstoqueController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'nome'             => 'required|string|max:120',
             'sku'              => 'nullable|string|max:60|unique:estoque,sku',
@@ -28,8 +27,12 @@ class EstoqueController extends Controller
             'preco_custo'      => 'required|numeric|min:0',
             'preco_venda'      => 'required|numeric|min:0',
         ]);
-        Estoque::query()->create($request->all());
-        return to_route('estoque.index');
+        try {
+          Estoque::query()->create($request->all());
+          return to_route('estoque.index')->with('sucesso', 'Item criado com sucesso!');
+        } catch (\Throwable $th) {
+          return to_route('estoque.index')->with('erro', 'Erro ao criar item. Tente novamente');
+        }
     }
 
     public function update(Request $request, Estoque $estoque)
@@ -43,12 +46,22 @@ class EstoqueController extends Controller
             'preco_custo'      => 'required|numeric|min:0',
             'preco_venda'      => 'required|numeric|min:0',
         ]);
-        $estoque->update($validated);
-        return to_route('estoque.index');
+        try {
+          $estoque->update($validated);
+          return to_route('estoque.index')->with('sucesso', 'Item atualizado com sucesso.');
+        } catch (\Throwable $th) {
+          return to_route('estoque.index')->with('erro', 'Erro ao atualizar item. Tente novamente');
+        }
     }
 
     public function destroy(Estoque $estoque)
     {
+      try {
+        $estoque->delete();
+        return to_route('estoque.index')->with('sucesso', 'Item removido com sucesso');
+      } catch (\Throwable $th) {
+        return to_route('estoque.index')->with('erro', 'Erro ao remover item. Tente novamente');
+      }
       $estoque->delete();
       return to_route('estoque.index');
     }
