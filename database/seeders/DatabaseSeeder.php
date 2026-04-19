@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             FornecedorSeeder::class,
             EstoqueSeeder::class,
             PedidoSeeder::class,
+            ServicoSeeder::class,
         ]);
     }
 }

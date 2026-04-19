@@ -10,9 +10,19 @@ class EstoqueController extends Controller
 {
     public function index()
     {
+      $perPage = in_array(request('perPage'), [10, 20, 30, 50])
+            ? (int) request('perPage')
+            : 10;
       return Inertia::render('estoque/Index', [
-        'estoque' => Estoque::query()->latest()
-                ->paginate(10)
+        'estoque' => Estoque::query()
+        ->when(request('search'), fn($q, $s) => 
+          $q->where('nome', 'like', "%{$s}%")
+            ->orWhere('sku', 'like', "%{$s}%")
+        )
+        ->latest()
+        ->paginate($perPage)
+        ->withQueryString(),
+        'filters' => request()->only('search', 'perPage'),
       ]);
     }
 

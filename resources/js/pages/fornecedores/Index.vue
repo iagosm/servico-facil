@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Form, Head, router } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -17,14 +17,16 @@ import {
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog';
+import { useDebounce } from '@vueuse/core';
 
 type Props = {
     fornecedores: {
         data: Fornecedores[];
-    };
+    },
+    filters: { search?: string; perPage?: number };
 };
-
 const props = defineProps<Props>();
+  console.log(props.filters)
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -60,6 +62,44 @@ const openEdit = (fornecedor: any) => {
 const backToList = () => {
     activePane.value = 'list';
 };
+
+// ── Busca com debounce ──────────────────────────────────
+const search = ref(props.filters.search ?? '')
+const searchDebounced = useDebounce(search, 500)
+
+// ── Quantidade por página ───────────────────────────────
+const perPage = ref(props.filters.perPage ?? 10)
+
+// ── Loading ─────────────────────────────────────────────
+const loading = ref(false)
+
+router.on('start', () => {
+    loading.value = true
+})
+
+router.on('finish', () => {
+    loading.value = false
+})
+
+// ── Navegação com filtros ───────────────────────────────
+function navegarComFiltros() {
+    const params: Record<string, string | number> = {
+        perPage: perPage.value,
+    }
+
+    if (searchDebounced.value) {
+        params.search = searchDebounced.value
+    }
+
+    router.get('/fornecedores', params, {
+        preserveState: true,
+        replace: true,
+    })
+}
+
+watch(searchDebounced, navegarComFiltros)
+watch(perPage, navegarComFiltros)
+
 </script>
 <template>
     <Head title="Fornecedores" />
@@ -99,6 +139,9 @@ const backToList = () => {
                     <GenericTable
                         :columns="columns"
                         :rows="props.fornecedores.data"
+                        :loading="loading"
+                        v-model:search="search"
+                        v-model:per-page="perPage"
                     >
                         <template #cell-email="{ value }">
                             {{ value || '-' }}
