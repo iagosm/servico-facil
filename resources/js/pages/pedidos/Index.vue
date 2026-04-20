@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Form } from '@inertiajs/vue3'
+import { ref, watch } from 'vue';
+import { Form, router } from '@inertiajs/vue3'
 import {
   Dialog,
   DialogTrigger,
@@ -18,6 +18,7 @@ import { Spinner } from '@/components/ui/spinner'
 import GenericTable from '@/components/tables/GenericTable.vue'
 import PedidoForm from '@/components/pedidos/PedidoForm.vue'
 import type { BreadcrumbItem } from '@/types'
+import { useDebounce } from '@vueuse/core';
 
 type Pedido = {
   id: number
@@ -48,6 +49,7 @@ type Props = {
   users: Array<{ id: number; name: string }>
   estoques: Array<{ id: number; nome: string }>
   fornecedores: Array<{ id: number; nome: string }>
+  filters: { search?: string; perPage?: number }
 }
 
 const props = defineProps<Props>()
@@ -82,6 +84,36 @@ const openEdit = (row: Pedido) => {
   selectedPedido.value = row
   activePane.value = 'edit'
 }
+
+const loading = ref(false)
+router.on('start', () => {
+    loading.value = true
+})
+
+router.on('finish', () => {
+    loading.value = false
+})
+const perPage = ref(props.filters.perPage ?? 10)
+const search = ref(props.filters.search ?? '')
+const searchDebounced = useDebounce(search, 500)
+
+function navegarComFiltros() {
+    const params: Record<string, string | number> = {
+        perPage: perPage.value,
+    }
+
+    if (searchDebounced.value) {
+        params.search = searchDebounced.value
+    }
+
+    router.get('/pedidos', params, {
+        preserveState: true,
+        replace: true,
+    })
+}
+
+watch(searchDebounced, navegarComFiltros)
+watch(perPage, navegarComFiltros)
 </script>
 <template>
   <Head title="Pedidos" />
@@ -125,7 +157,9 @@ const openEdit = (row: Pedido) => {
         </div>
       </div>
       <div v-if="activePane === 'list'">
-        <GenericTable :columns="columns" :rows="pedidos.data">
+        <GenericTable :columns="columns" :rows="pedidos.data" v-model:per-page="perPage"
+          :loading="loading"
+          v-model:search="search">
           <template #cell-fornecedor="{ value }">
             {{ value?.nome ?? '—' }}
           </template>

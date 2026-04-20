@@ -12,10 +12,20 @@ class ClienteController extends Controller
 {
     public function index(): Response
     {
+        $perPage = in_array(request('perPage'), [10, 20, 30, 50]) 
+        ? (int) request('perPage') 
+        : 10;
         return Inertia::render('clientes/Index', [
             'clientes' => Cliente::query()
-                ->latest()
-                ->paginate(10),
+            ->when(request('search'), fn($q, $s) =>
+              $q->where('nome', 'like', "%{$s}%")
+              ->orWhere('email', 'like', "%{$s}%")
+              ->orWhere('telefone', 'like', "%{$s}%")
+            )
+              ->latest()
+              ->paginate($perPage)
+              ->withQueryString(),
+            'filters' => request()->only('search', 'perPage'),
         ]);
     }
 

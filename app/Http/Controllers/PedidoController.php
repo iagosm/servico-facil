@@ -13,17 +13,26 @@ class PedidoController extends Controller
    */
   public function index()
   {
+    $perPage = in_array(request('perPage'), [10, 20, 30, 50])
+            ? (int) request('perPage')
+            : 10;
     $pedidos = Pedido::with([
       'estoque',
       'fornecedor',
       'solicitadoPor',
       'recebidoPor',
     ])
-      ->when(request('status'), fn($q, $s) => $q->where('status', $s))
-      ->when(request('fornecedor_id'), fn($q, $f) => $q->where('fornecedor_id', $f))
-      ->when(request('search'), fn($q, $s) => $q->where('descricao', 'like', "%{$s}%"))
+      ->when(request('search'), fn($q, $s) =>    
+      $q->where('descricao', 'like', "%{$s}%")
+      ->orWhere('status', 'like', "%{$s}%")
+      ->orWhereHas('fornecedor', fn($rel) =>
+          $rel->where('nome', 'like', "%{$s}%")
+      )
+      ->orWhereHas('solicitadoPor', fn($rel) =>
+          $rel->where('name', 'like', "%{$s}%")
+      ))
       ->latest()
-      ->paginate(15)
+      ->paginate($perPage)
       ->withQueryString();
     return inertia('pedidos/Index', [
       'pedidos' => $pedidos,

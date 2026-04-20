@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Form, Head, router } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -17,13 +17,15 @@ import {
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog';
+import { useDebounce } from '@vueuse/core';
 
 type Cliente = ClienteFormCliente & { id: number };
 
 type Props = {
     clientes: {
         data: Cliente[];
-    };
+    },
+    filters: { search?: string; perPage?: number };
 };
 
 const props = defineProps<Props>();
@@ -58,6 +60,36 @@ const openEdit = (cliente: any) => {
 const backToList = () => {
     activePane.value = 'list';
 };
+
+const loading = ref(false)
+router.on('start', () => {
+    loading.value = true
+})
+
+router.on('finish', () => {
+    loading.value = false
+})
+const perPage = ref(props.filters.perPage ?? 10)
+const search = ref(props.filters.search ?? '')
+const searchDebounced = useDebounce(search, 500)
+
+function navegarComFiltros() {
+    const params: Record<string, string | number> = {
+        perPage: perPage.value,
+    }
+
+    if (searchDebounced.value) {
+        params.search = searchDebounced.value
+    }
+
+    router.get('/clientes', params, {
+        preserveState: true,
+        replace: true,
+    })
+}
+
+watch(searchDebounced, navegarComFiltros)
+watch(perPage, navegarComFiltros)
 </script>
 
 <template>
@@ -98,6 +130,9 @@ const backToList = () => {
                     <GenericTable
                         :columns="columns"
                         :rows="props.clientes.data"
+                        v-model:per-page="perPage"
+                        :loading="loading"
+                        v-model:search="search"
                     >
                         <template #cell-email="{ value }">
                             {{ value || '-' }}

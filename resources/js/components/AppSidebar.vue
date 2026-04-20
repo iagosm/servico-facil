@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Users, ShoppingCart, UserCheck, DollarSign, Package, UsersRound, Truck } from 'lucide-vue-next';
-import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -14,64 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Serviços / OS',
-        href: '/servicos',
-        icon: Users,
-    },
-    {
-        title: 'Clientes',
-        href: '/clientes',
-        icon: UsersRound,
-    },
-    {
-        title: 'Estoque',
-        href: '/estoque',
-        icon: Package,
-    },
-    {
-        title: 'Fornecedores',
-        href: '/fornecedores',
-        icon: Truck,
-    },
-    {
-        title: 'Pedidos',
-        href: '/pedidos',
-        icon: ShoppingCart,
-    },
-    {
-        title: 'Financeiro',
-        href: '/financeiro',
-        icon: DollarSign,
-    },
-    {
-        title: 'Equipe',
-        href: '/equipe',
-        icon: UserCheck,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+import { mainNavItems, footerNavItems } from '@/config/nav';
 </script>
 
 <template>
@@ -80,10 +20,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                      <h1>Serviço Fácil</h1>
-                        <!-- <Link :href="dashboard()">
-                            <AppLogo />
-                        </Link> -->
+                        <h1>Serviço Fácil</h1>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
