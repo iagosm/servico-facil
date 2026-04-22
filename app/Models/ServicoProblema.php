@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ServicoProblema extends Model
 {
-//     protected $fillable = [
-//     'servico_equipamento_id',
-//     'descricao', 'laudo_tecnico', 'resolvido',
-// ];
+  protected $fillable = [
+    'servico_equipamento_id',
+    'descricao', 'laudo_tecnico', 'resolvido',
+  ];
 
 public function equipamento(): BelongsTo
 {
