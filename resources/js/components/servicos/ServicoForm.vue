@@ -86,6 +86,13 @@ function onClienteCriado(cliente: ClienteSimples) {
     clienteId.value = cliente.id
 }
 
+// ✅ CORREÇÃO: setTimeout movido para função — não pode ser chamado inline no template
+function fecharDropdownCliente() {
+    setTimeout(() => {
+        mostrarDropdownCliente.value = false
+    }, 200)
+}
+
 function addEquipamento() {
     equipamentos.push({ tipo: '', marca: '', modelo: '', numero_serie: '', condicao_entrada: '', problemas: [{ descricao: '' }] })
 }
@@ -170,7 +177,7 @@ function submit() {
                                 v-model="buscaCliente"
                                 placeholder="Buscar cliente por nome ou telefone..."
                                 @focus="mostrarDropdownCliente = true"
-                                @blur="setTimeout(() => mostrarDropdownCliente = false, 200)"
+                                @blur="fecharDropdownCliente"
                             />
                             <div
                                 v-if="mostrarDropdownCliente && clientesFiltrados.length"
@@ -326,7 +333,6 @@ function submit() {
                             <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                 Problemas relatados
                             </span>
-                            <!-- Botão + Problema destacado em violet -->
                             <button
                                 type="button"
                                 class="inline-flex items-center gap-1 rounded-md border border-violet-500/60 bg-violet-50 dark:bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-500/20 transition-colors"
