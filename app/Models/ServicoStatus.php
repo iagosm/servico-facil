@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ServicoStatus extends Model
 {
+  protected $table = 'servico_status';
+
+  protected $fillable = [
+    'servico_id', 'user_id',
+    'status_anterior', 'status_novo', 'observacao',
+  ];
 //     protected $fillable = [
 //     'servico_id', 'user_id',
 //     'status_anterior', 'status_novo', 'observacao',

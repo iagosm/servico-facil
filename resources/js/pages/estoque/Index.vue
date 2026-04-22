@@ -49,17 +49,17 @@ const columns = [
 ];
 
 const activePane = ref<'list' | 'create' | 'edit'>('list');
-const selectedCliente = ref<Estoque | null>(null);
+const selectedEstoque = ref<Estoque | null>(null);
 
 const openCreate = () => {
-    selectedCliente.value = null;
+    selectedEstoque.value = null;
     activePane.value = 'create';
 };
 
-// const openEdit = (cliente: any) => {
-//     selectedCliente.value = cliente as Cliente;
-//     activePane.value = 'edit';
-// };
+const openEdit = (estoque: any) => {
+    selectedEstoque.value = estoque as Estoque;
+    activePane.value = 'edit';
+};
 
 const backToList = () => {
     activePane.value = 'list';
@@ -225,8 +225,8 @@ watch(perPage, navegarComFiltros)
                 <div v-else-if="activePane === 'edit'">
                     <EstoqueForm
                         mode="edit"
-                        :cliente="selectedCliente"
-                        :key="selectedCliente?.id ?? 'edit-null'"
+                        :cliente="selectedEstoque"
+                        :key="selectedEstoque?.id ?? 'edit-null'"
                         @cancel="backToList"
                     />
                 </div>
