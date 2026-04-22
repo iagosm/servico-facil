@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 
-export type Cliente = {
+export type Estoque = {
     id?: number;
     nome: string;
     descricao: string;
@@ -20,7 +20,7 @@ export type Cliente = {
 
 type Props = {
     mode: 'create' | 'edit';
-    cliente?: Cliente | null;
+    cliente?: Estoque | null;
 };
 
 const props = defineProps<Props>();
@@ -48,6 +48,8 @@ const title = props.mode === 'create' ? 'Novo Item' : 'Editar Item';
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-6 md:grid-cols-2">
+
+                <!-- Nome -->
                 <div class="grid gap-2">
                     <Label for="nome">Nome</Label>
                     <Input
@@ -55,83 +57,100 @@ const title = props.mode === 'create' ? 'Novo Item' : 'Editar Item';
                         name="nome"
                         type="text"
                         required
-                        placeholder="Nome Item"
+                        placeholder="Nome do item"
                         :default-value="cliente?.nome ?? ''"
                     />
                     <InputError :message="errors.nome" />
                 </div>
+
+                <!-- Descrição -->
                 <div class="grid gap-2">
                     <Label for="descricao">Descrição</Label>
                     <Input
                         id="descricao"
                         name="descricao"
                         type="text"
-                        required
                         placeholder="Descrição"
                         :default-value="cliente?.descricao ?? ''"
                     />
-                    <InputError :message="errors.nome" />
+                    <InputError :message="errors.descricao" />
                 </div>
+
+                <!-- SKU -->
                 <div class="grid gap-2">
                     <Label for="sku">SKU</Label>
                     <Input
                         id="sku"
                         name="sku"
                         type="text"
-                        required
                         placeholder="SKU"
                         :default-value="cliente?.sku ?? ''"
                     />
                     <InputError :message="errors.sku" />
                 </div>
+
+                <!-- Quantidade -->
                 <div class="grid gap-2">
                     <Label for="quantidade">Quantidade</Label>
                     <Input
                         id="quantidade"
                         name="quantidade"
-                        type="text"
+                        type="number"
+                        min="0"
                         required
-                        placeholder="Quantidade"
+                        placeholder="0"
                         :default-value="cliente?.quantidade ?? ''"
                     />
-                    <InputError :message="errors.sku" />
+                    <InputError :message="errors.quantidade" />
                 </div>
+
+                <!-- Quantidade Mínima -->
                 <div class="grid gap-2">
                     <Label for="quantidade_minima">Quantidade Mínima</Label>
                     <Input
                         id="quantidade_minima"
                         name="quantidade_minima"
-                        type="text"
+                        type="number"
+                        min="0"
                         required
-                        placeholder="Quantidade Mínima"
+                        placeholder="0"
                         :default-value="cliente?.quantidade_minima ?? ''"
                     />
                     <InputError :message="errors.quantidade_minima" />
                 </div>
+
+                <!-- Preço Custo -->
                 <div class="grid gap-2">
-                    <Label for="preco_custo">Preço Custo</Label>
+                    <Label for="preco_custo">Preço Custo (R$)</Label>
                     <Input
                         id="preco_custo"
                         name="preco_custo"
-                        type="text"
+                        type="number"
+                        step="0.01"
+                        min="0"
                         required
-                        placeholder="Preço Custo"
+                        placeholder="0,00"
                         :default-value="cliente?.preco_custo ?? ''"
                     />
-                    <InputError :message="errors.telefone" />
+                    <InputError :message="errors.preco_custo" />
                 </div>
 
+                <!-- Preço Venda -->
                 <div class="grid gap-2">
-                    <Label for="preco_venda">Preço Venda</Label>
+                    <Label for="preco_venda">Preço Venda (R$)</Label>
                     <Input
                         id="preco_venda"
                         name="preco_venda"
-                        type="text"
-                        placeholder="Preço Venda"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        required
+                        placeholder="0,00"
                         :default-value="cliente?.preco_venda ?? ''"
                     />
-                    <InputError :message="errors.email" />
+                    <InputError :message="errors.preco_venda" />
                 </div>
+
             </div>
 
             <div class="flex items-center gap-3">
