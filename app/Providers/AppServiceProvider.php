@@ -46,5 +46,10 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+
+        // Força HTTPS em produção
+        if (app()->isProduction()) {
+            \URL::forceScheme('https');
+        }
     }
 }
