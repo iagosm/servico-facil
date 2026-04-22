@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServicoEquipamento extends Model
 {
-  //  protected $fillable = [
-  //   'servico_id', 'tipo', 'marca',
-  //   'modelo', 'numero_serie', 'condicao_entrada',
-  // ];
+   protected $fillable = [
+    'servico_id', 'tipo', 'marca',
+    'modelo', 'numero_serie', 'condicao_entrada',
+  ];
 
   public function servico(): BelongsTo
   {
