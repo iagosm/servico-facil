@@ -28,41 +28,99 @@ type TecnicoSelecionado = {
 
 type ItemClienteLocal = { descricao: string }
 
+type ServicoEdit = {
+    id: number
+    numero: string
+    cliente_id: number
+    supervisor_id?: number | null
+    tipo: 'diagnostico' | 'reparo' | 'orcamento'
+    prioridade: 'normal' | 'urgente' | 'aguardando_aprovacao'
+    obs_internas?: string
+    obs_cliente?: string
+    valor_cobrado?: number
+    data_previsao?: string
+    validade_orcamento?: string
+    equipamentos: {
+        tipo: string
+        marca?: string
+        modelo?: string
+        numero_serie?: string
+        condicao_entrada?: string
+        problemas: { descricao: string; resolvido?: boolean }[]
+    }[]
+    itens_cliente: { descricao: string }[]
+    users: { id: number; pivot: { papel: string } }[]
+}
+
 type Props = {
     clientes: ClienteSimples[]
     tecnicos: Tecnico[]
     supervisores: { id: number; name: string }[]
     mode?: 'create' | 'edit'
+    servico?: ServicoEdit
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{ cancel: [] }>()
 
-const clienteId = ref<number | null>(null)
+const isEdit = computed(() => props.mode === 'edit' && !!props.servico)
+
+// ─── Cliente ─────────────────────────────────────────────────────────────────
+const clienteId = ref<number | null>(isEdit.value ? props.servico!.cliente_id : null)
 const clientesBuscados = ref<ClienteSimples[]>([...props.clientes])
 const buscaCliente = ref('')
 const mostrarDropdownCliente = ref(false)
 
+// ─── Formulário principal ─────────────────────────────────────────────────────
 const form = reactive({
-    tipo: 'reparo' as 'diagnostico' | 'reparo' | 'orcamento',
-    prioridade: 'normal' as 'normal' | 'urgente' | 'aguardando_aprovacao',
-    supervisor_id: null as number | null,
-    data_previsao: '',
-    valor_cobrado: '',
-    obs_internas: '',
-    obs_cliente: '',
-    validade_orcamento: '',
+    tipo:               (isEdit.value ? props.servico!.tipo               : 'reparo')  as 'diagnostico' | 'reparo' | 'orcamento',
+    prioridade:         (isEdit.value ? props.servico!.prioridade         : 'normal')  as 'normal' | 'urgente' | 'aguardando_aprovacao',
+    supervisor_id:      (isEdit.value ? props.servico!.supervisor_id      : null)      as number | null,
+    data_previsao:       isEdit.value ? (props.servico!.data_previsao      ?? '')       : '',
+    valor_cobrado:       isEdit.value ? String(props.servico!.valor_cobrado ?? '')      : '',
+    obs_internas:        isEdit.value ? (props.servico!.obs_internas       ?? '')       : '',
+    obs_cliente:         isEdit.value ? (props.servico!.obs_cliente        ?? '')       : '',
+    validade_orcamento:  isEdit.value ? (props.servico!.validade_orcamento ?? '')       : '',
 })
 
-const equipamentos = reactive<Equipamento[]>([
-    { tipo: '', marca: '', modelo: '', numero_serie: '', condicao_entrada: '', problemas: [{ descricao: '' }] }
-])
+// ─── Equipamentos ─────────────────────────────────────────────────────────────
+const equipamentosIniciais: Equipamento[] = isEdit.value && props.servico!.equipamentos.length
+    ? props.servico!.equipamentos.map(eq => ({
+        tipo:             eq.tipo,
+        marca:            eq.marca            ?? '',
+        modelo:           eq.modelo           ?? '',
+        numero_serie:     eq.numero_serie     ?? '',
+        condicao_entrada: eq.condicao_entrada ?? '',
+        problemas:        eq.problemas.length
+            ? eq.problemas.map(p => ({ descricao: p.descricao }))
+            : [{ descricao: '' }],
+    }))
+    : [{ tipo: '', marca: '', modelo: '', numero_serie: '', condicao_entrada: '', problemas: [{ descricao: '' }] }]
 
-const itensCliente = reactive<ItemClienteLocal[]>([])
-const tecnicos = reactive<TecnicoSelecionado[]>([])
+const equipamentos = reactive<Equipamento[]>(equipamentosIniciais)
+
+// ─── Itens do cliente ─────────────────────────────────────────────────────────
+const itensClienteIniciais: ItemClienteLocal[] = isEdit.value
+    ? (props.servico!.itens_cliente ?? []).map(i => ({ descricao: i.descricao }))
+    : []
+
+const itensCliente = reactive<ItemClienteLocal[]>(itensClienteIniciais)
+
+// ─── Técnicos ─────────────────────────────────────────────────────────────────
+const tecnicosIniciais: TecnicoSelecionado[] = isEdit.value
+    ? (props.servico!.users ?? []).map(u => ({
+        user_id: u.id,
+        papel:   (u.pivot.papel as TecnicoSelecionado['papel']) ?? 'executor',
+    }))
+    : []
+
+const tecnicos = reactive<TecnicoSelecionado[]>(tecnicosIniciais)
+
+// ─── Estado ───────────────────────────────────────────────────────────────────
 const processing = ref(false)
 const errors = reactive<Record<string, string>>({})
 
+// ─── Computeds de cliente ─────────────────────────────────────────────────────
 const clienteSelecionado = computed(() =>
     clientesBuscados.value.find(c => c.id === clienteId.value)
 )
@@ -86,13 +144,11 @@ function onClienteCriado(cliente: ClienteSimples) {
     clienteId.value = cliente.id
 }
 
-// ✅ CORREÇÃO: setTimeout movido para função — não pode ser chamado inline no template
 function fecharDropdownCliente() {
-    setTimeout(() => {
-        mostrarDropdownCliente.value = false
-    }, 200)
+    setTimeout(() => { mostrarDropdownCliente.value = false }, 200)
 }
 
+// ─── Equipamentos ─────────────────────────────────────────────────────────────
 function addEquipamento() {
     equipamentos.push({ tipo: '', marca: '', modelo: '', numero_serie: '', condicao_entrada: '', problemas: [{ descricao: '' }] })
 }
@@ -106,11 +162,13 @@ function removeProblema(eqIdx: number, pIdx: number) {
     if (equipamentos[eqIdx].problemas.length > 1) equipamentos[eqIdx].problemas.splice(pIdx, 1)
 }
 
+// ─── Itens e técnicos ─────────────────────────────────────────────────────────
 function addItem() { itensCliente.push({ descricao: '' }) }
 function removeItem(i: number) { itensCliente.splice(i, 1) }
 function addTecnico() { tecnicos.push({ user_id: null, papel: 'executor' }) }
 function removeTecnico(i: number) { tecnicos.splice(i, 1) }
 
+// ─── Validação e submit ───────────────────────────────────────────────────────
 function validate(): boolean {
     Object.keys(errors).forEach(k => delete errors[k])
     let ok = true
@@ -124,7 +182,8 @@ function validate(): boolean {
 function submit() {
     if (!validate()) return
     processing.value = true
-    router.post('/servicos', {
+
+    const payload = {
         cliente_id: clienteId.value,
         ...form,
         equipamentos: equipamentos.map(eq => ({
@@ -133,16 +192,28 @@ function submit() {
         })),
         itens_cliente: itensCliente.filter(i => i.descricao.trim()),
         tecnicos: tecnicos.filter(t => t.user_id),
-    }, {
-        onError: (e) => { Object.assign(errors, e) },
-        onFinish: () => { processing.value = false },
-    })
+    }
+
+    if (isEdit.value) {
+        router.put(`/servicos/${props.servico!.id}`, payload, {
+            onError:  (e) => { Object.assign(errors, e) },
+            onFinish: () => { processing.value = false },
+        })
+    } else {
+        router.post('/servicos', payload, {
+            onError:  (e) => { Object.assign(errors, e) },
+            onFinish: () => { processing.value = false },
+        })
+    }
 }
 </script>
 
 <template>
     <div class="space-y-6">
-        <Heading variant="small" title="Nova Ordem de Serviço" />
+        <Heading
+            variant="small"
+            :title="isEdit ? `Editar OS ${servico?.numero}` : 'Nova Ordem de Serviço'"
+        />
 
         <form @submit.prevent="submit" class="space-y-6">
 
@@ -327,7 +398,7 @@ function submit() {
                         </div>
                     </div>
 
-                    <!-- Problemas — área destacada com borda dashed -->
+                    <!-- Problemas -->
                     <div class="rounded-lg border border-dashed border-border bg-background/60 p-3 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -411,7 +482,7 @@ function submit() {
             <div class="flex items-center gap-3">
                 <Button type="submit" :disabled="processing">
                     <Spinner v-if="processing" class="mr-2 inline" />
-                    Criar OS
+                    {{ isEdit ? 'Salvar alterações' : 'Criar OS' }}
                 </Button>
                 <Button type="button" variant="secondary" :disabled="processing" @click="emit('cancel')">
                     Cancelar

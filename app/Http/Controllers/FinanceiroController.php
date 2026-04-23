@@ -58,7 +58,6 @@ class FinanceiroController extends Controller
         $rankingTecnicos = ServicoUser::query()
             ->join('servicos', 'servico_users.servico_id', '=', 'servicos.id')
             ->join('users',    'servico_users.user_id',    '=', 'users.id')
-            ->where('servico_users.papel', 'tecnico')
             ->whereNotNull('servicos.data_conclusao')
             ->whereBetween('servicos.data_conclusao', [$inicio, $fim])
             ->whereIn('servicos.status', ['pronto', 'entregue'])

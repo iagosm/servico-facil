@@ -79,6 +79,6 @@ class Servico extends Model
      */
     public function statusTimeline(): HasMany
     {
-        return $this->hasMany(ServicoStatus::class)->orderBy('created_at');
+        return $this->hasMany(ServicoStatus::class)->with('user')->orderBy('created_at');
     }
 }

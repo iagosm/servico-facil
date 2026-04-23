@@ -25,7 +25,7 @@ type Servico = {
     equipamentos: Equipamento[]
     itensCliente: { id: number; descricao: string }[]
     users: { id: number; name: string; pivot: { papel: string } }[]
-    statusTimeline: StatusEntry[]
+    status_timeline: StatusEntry[]
 }
 
 type Props = {
@@ -35,7 +35,7 @@ type Props = {
 }
 
 const props = defineProps<Props>()
-
+  console.log(props.servico.status_timeline)
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Serviços', href: '/servicos' },
     { title: props.servico.numero, href: `/servicos/${props.servico.id}` },
@@ -69,10 +69,16 @@ function formatDate(d?: string) {
 }
 function formatDateTime(d?: string) {
     if (!d) return '—'
-    return new Date(d).toLocaleString('pt-BR')
+    return new Date(d).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).replace(',', ' às')
 }
 function formatMoney(v?: number) {
-    if (v === null || v === undefined) return '—'
+    if (v === null || v === undefined || v === 0) return '—'
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
 }
 
@@ -249,18 +255,15 @@ const statusAtualIdx = fluxoStatus.indexOf(props.servico.status)
                                 <dd class="font-medium">{{ formatMoney(servico.custo_total) }}</dd>
                             </div>
                         </dl>
+                        
+                        <hr class="my-4 border-border" />
+                        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">Obs. cliente</p>
+                        <p class="text-sm">{{ servico.obs_cliente }}</p>
+                        
 
-                        <template v-if="servico.obs_cliente">
-                            <hr class="my-4 border-border" />
-                            <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">Obs. cliente</p>
-                            <p class="text-sm">{{ servico.obs_cliente }}</p>
-                        </template>
-
-                        <template v-if="servico.obs_internas">
-                            <hr class="my-4 border-border" />
-                            <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">Obs. internas</p>
-                            <p class="text-sm">{{ servico.obs_internas }}</p>
-                        </template>
+                        <hr class="my-4 border-border" />
+                        <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">Obs. internas</p>
+                        <p class="text-sm">{{ servico.obs_internas ?? ''}}</p>
                     </div>
 
                     <!-- Equipamentos -->
@@ -274,9 +277,9 @@ const statusAtualIdx = fluxoStatus.indexOf(props.servico.status)
                                 {{ eq.tipo.charAt(0).toUpperCase() }}
                             </div>
                             <div>
-                                <p class="font-semibold">{{ eq.tipo }}</p>
+                                <p class="font-semibold">{{ eq.modelo}}</p>
                                 <p class="text-xs text-muted-foreground">
-                                    {{ [eq.marca, eq.modelo].filter(Boolean).join(' · ') || 'Sem detalhes adicionais' }}
+                                    {{ [eq.marca, eq.tipo ].filter(Boolean).join(' · ') || 'Sem detalhes adicionais' }}
                                     <span v-if="eq.numero_serie"> · S/N: {{ eq.numero_serie }}</span>
                                 </p>
                             </div>
@@ -372,9 +375,9 @@ const statusAtualIdx = fluxoStatus.indexOf(props.servico.status)
                         <h2 class="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-4">
                             Histórico
                         </h2>
-                        <div v-if="servico.statusTimeline?.length" class="relative space-y-4 before:absolute before:left-3 before:top-1 before:h-[calc(100%-8px)] before:w-px before:bg-border">
+                        <div v-if="servico.status_timeline?.length" class="relative space-y-4 before:absolute before:left-3 before:top-1 before:h-[calc(100%-8px)] before:w-px before:bg-border">
                             <div
-                                v-for="entry in [...(servico.statusTimeline ?? [])].reverse()"
+                                v-for="entry in [...(servico.status_timeline ?? [])].reverse()"
                                 :key="entry.id"
                                 class="relative pl-8"
                             >

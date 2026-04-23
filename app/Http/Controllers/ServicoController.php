@@ -26,7 +26,6 @@ class ServicoController extends Controller
             ->latest()
             ->paginate(request('perPage', 15))
             ->withQueryString();
-
         return inertia('servicos/Index', [
             'servicos' => $servicos,
             'filters'  => request()->only('search', 'status', 'prioridade', 'perPage'),
@@ -96,7 +95,7 @@ class ServicoController extends Controller
                 'prioridade'         => $request->prioridade,
                 'obs_internas'       => $request->obs_internas,
                 'obs_cliente'        => $request->obs_cliente,
-                'valor_cobrado'      => $request->valor_cobrado,
+                'valor_cobrado'      => $request->valor_cobrado ?? 0,
                 'data_entrada'       => now(),
                 'data_previsao'      => $request->data_previsao,
                 'validade_orcamento' => $request->validade_orcamento,
@@ -152,9 +151,8 @@ class ServicoController extends Controller
             'equipamentos.pecas.estoque',
             'itensCliente',
             'users',
-            'statusTimeline.user',
+            'statusTimeline',
         ]);
-
         return inertia('servicos/Show', [
             'servico'     => $servico,
             'tecnicos'    => User::where('ativo', true)
