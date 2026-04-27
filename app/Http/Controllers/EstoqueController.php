@@ -10,25 +10,24 @@ class EstoqueController extends Controller
 {
     public function index()
     {
-      $perPage = in_array(request('perPage'), [10, 20, 30, 50])
-            ? (int) request('perPage')
-            : 10;
-      return Inertia::render('estoque/Index', [
-        'estoque' => Estoque::query()
-        ->when(request('search'), fn($q, $s) => 
-          $q->where('nome', 'like', "%{$s}%")
-            ->orWhere('sku', 'like', "%{$s}%")
-        )
-        ->latest()
-        ->paginate($perPage)
-        ->withQueryString(),
-        'filters' => request()->only('search', 'perPage'),
+      $tipo = request('tipo', 'insumo');
+      return inertia('estoque/Index', [
+          'estoque' => Estoque::query()
+              ->where('tipo', $tipo)
+              ->when(request('search'), fn($q, $s) =>
+                  $q->where('nome', 'like', "%{$s}%")
+                    ->orWhere('sku',  'like', "%{$s}%"))
+              ->paginate(request('perPage', 10))
+              ->withQueryString(),
+          'filters' => request()->only('search', 'perPage', 'tipo'),
       ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'tipo'              => 'required|in:insumo,venda',
+            'condicao' => 'required|in:novo,conservado,com_defeito,para_pecas',
             'nome'             => 'required|string|max:120',
             'sku'              => 'nullable|string|max:60|unique:estoque,sku',
             'descricao'        => 'nullable|string',
@@ -48,8 +47,10 @@ class EstoqueController extends Controller
     public function update(Request $request, Estoque $estoque)
     {
         $validated = $request->validate([
+            'tipo'              => 'required|in:insumo,venda',
+            'condicao' => 'required|in:novo,conservado,com_defeito,para_pecas',
             'nome'             => 'required|string|max:120',
-            'sku'              => 'nullable|string|max:60|unique:estoque,sku',
+            'sku'               => 'nullable|string|max:60|unique:estoque,sku,' . $estoque->id,
             'descricao'        => 'nullable|string',
             'quantidade'       => 'required|integer|min:0',
             'quantidade_minima'=> 'required|integer|min:0',

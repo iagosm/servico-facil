@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['nome', 'descricao', 'sku', 'quantidade', 'quantidade_minima', 'preco_custo', 'preco_venda'])]
+#[Fillable(['nome', 'tipo', 'condicao', 'descricao', 'sku', 'quantidade', 'quantidade_minima', 'preco_custo', 'preco_venda'])]
 class Estoque extends Model
 {
   protected $table = 'estoque';

@@ -142,6 +142,7 @@ watch(perPage, navegarComFiltros)
                         :loading="loading"
                         v-model:search="search"
                         v-model:per-page="perPage"
+                        :pagination="fornecedores"
                     >
                         <template #cell-email="{ value }">
                             {{ value || '-' }}

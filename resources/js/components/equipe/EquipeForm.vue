@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
+import { vMaska } from 'maska/vue'
 import Heading from '@/components/Heading.vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -103,6 +104,7 @@ const title = props.mode === 'create' ? 'Novo Membro' : 'Editar Membro';
                 <Input
                     id="telefone"
                     name="telefone"
+                    v-maska="'(##) ####-####'"
                     type="text"
                     required
                     placeholder="(XX) XXXX-XXXX"

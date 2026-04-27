@@ -159,7 +159,8 @@ watch(perPage, navegarComFiltros)
       <div v-if="activePane === 'list'">
         <GenericTable :columns="columns" :rows="pedidos.data" v-model:per-page="perPage"
           :loading="loading"
-          v-model:search="search">
+          v-model:search="search"
+          :pagination="pedidos">
           <template #cell-fornecedor="{ value }">
             {{ value?.nome ?? '—' }}
           </template>

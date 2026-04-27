@@ -152,6 +152,7 @@ function formatDate(d?: string) {
                 v-model:per-page="perPage"
                 :loading="loading"
                 v-model:search="search"
+                :pagination="servicos"
             >
                 <template #cell-cliente="{ value }">
                     {{ value?.nome ?? '—' }}

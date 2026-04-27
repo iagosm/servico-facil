@@ -132,6 +132,7 @@ watch(perPage, navegarComFiltros)
                         :rows="props.clientes.data"
                         v-model:per-page="perPage"
                         :loading="loading"
+                        :pagination="clientes"
                         v-model:search="search"
                     >
                         <template #cell-email="{ value }">

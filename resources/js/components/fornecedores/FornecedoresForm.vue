@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
+import {vMaska} from 'maska/vue';
+import { computed } from 'vue';
 import Heading from '@/components/Heading.vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { computed } from 'vue';
+
 
 export type Fornecedores = {
     id?: number;
@@ -83,6 +85,7 @@ const title = props.mode === 'create' ? 'Novo Fornecedor' : 'Editar Fornecedor';
                         name="telefone"
                         type="text"
                         required
+                        v-maska="'(##) ####-####'"
                         placeholder="Telefone"
                         :default-value="fornecedores?.telefone ?? ''"
                     />

@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import { Form } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
+import { vMaska } from 'maska/vue';
 import Heading from '@/components/Heading.vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+
 
 export type Cliente = {
     id?: number;
@@ -36,6 +39,30 @@ const actionUrl = props.mode === 'create'
 
 const submitLabel = props.mode === 'create' ? 'Salvar' : 'Atualizar';
 const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
+
+const documento = ref(props.cliente?.documento ?? '');
+
+const tipoDocumento = ref<'cpf' | 'cnpj'>(() => {
+    if (!props.cliente?.documento) return 'cpf';
+    return props.cliente.documento.replace(/\D/g, '').length > 11 ? 'cnpj' : 'cpf';
+});
+
+const documentoMask = computed(() =>
+    tipoDocumento.value === 'cpf'
+        ? '###.###.###-##'
+        : '##.###.###/####-##'
+);
+
+const documentoPlaceholder = computed(() =>
+    tipoDocumento.value === 'cpf'
+        ? '000.000.000-00'
+        : '00.000.000/0001-00'
+);
+
+function selecionarTipo(tipo: 'cpf' | 'cnpj') {
+    tipoDocumento.value = tipo;
+    documento.value = '';
+}
 </script>
 
 <template>
@@ -50,6 +77,7 @@ const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-6 md:grid-cols-2">
+
                 <div class="grid gap-2">
                     <Label for="nome">Nome</Label>
                     <Input
@@ -70,6 +98,7 @@ const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
                         name="telefone"
                         type="text"
                         required
+                        v-maska="'(##) ####-####'"
                         placeholder="Telefone"
                         :default-value="cliente?.telefone ?? ''"
                     />
@@ -89,14 +118,46 @@ const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="documento">Documento</Label>
-                    <Input
-                        id="documento"
-                        name="documento"
-                        type="text"
-                        placeholder="Documento (opcional)"
-                        :default-value="cliente?.documento ?? ''"
-                    />
+                    <div class="flex items-baseline gap-2">
+                        <Label for="documento">Documento</Label>
+                        <span class="text-xs text-muted-foreground">opcional</span>
+                    </div>
+
+                    <div class="flex h-9 w-full rounded-md border border-input bg-background shadow-xs focus-within:ring-[3px] focus-within:ring-ring/50 transition-shadow">
+                        <button
+                            type="button"
+                            @click="selecionarTipo('cpf')"
+                            :class="[
+                                'px-3 text-sm font-medium shrink-0 rounded-l-md border-r border-input transition-colors',
+                                tipoDocumento === 'cpf'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                            ]"
+                        >
+                            CPF
+                        </button>
+                        <button
+                            type="button"
+                            @click="selecionarTipo('cnpj')"
+                            :class="[
+                                'px-3 text-sm font-medium shrink-0 border-r border-input transition-colors',
+                                tipoDocumento === 'cnpj'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                            ]"
+                        >
+                            CNPJ
+                        </button>
+                        <input
+                            id="documento"
+                            name="documento"
+                            type="text"
+                            v-model="documento"
+                            v-maska="documentoMask"
+                            :placeholder="documentoPlaceholder"
+                            class="flex-1 min-w-0 bg-transparent px-3 text-sm placeholder:text-muted-foreground outline-none"
+                        />
+                    </div>
                     <InputError :message="errors.documento" />
                 </div>
 
@@ -142,7 +203,8 @@ const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
                         id="cep"
                         name="cep"
                         type="text"
-                        placeholder="CEP (opcional)"
+                        v-maska="'#####-###'"
+                        placeholder="00000-000"
                         :default-value="cliente?.cep ?? ''"
                     />
                     <InputError :message="errors.cep" />
@@ -159,6 +221,7 @@ const title = props.mode === 'create' ? 'Novo Cliente' : 'Editar Cliente';
                     >{{ cliente?.observacoes ?? '' }}</textarea>
                     <InputError :message="errors.observacoes" />
                 </div>
+
             </div>
 
             <div class="flex items-center gap-3">

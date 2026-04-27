@@ -32,6 +32,7 @@ type Props = {
     columns: Column[];
     rows: Array<Record<string, unknown>>;
     rowKey?: string;
+    rowClass?: (row: Record<string, unknown>) => string;
     emptyMessage?: string;
     pagination?: Pagination;
     sort?: Sort;
@@ -69,7 +70,6 @@ const paginacaoTexto = computed(() => {
 
 const linksVisiveis = computed(() => {
     if (!props.pagination) return []
-
     return props.pagination.links
 })
 
@@ -94,9 +94,7 @@ function ordenarPor(column: Column) {
 
 function iconeOrdenacao(column: Column) {
     if (!column.sortable) return null
-
     if (props.sort?.column !== column.key) return 'neutro'
-
     return props.sort.direction === 'asc' ? 'asc' : 'desc'
 }
 </script>
@@ -197,6 +195,7 @@ function iconeOrdenacao(column: Column) {
                         v-else
                         :key="(row as any)[rowKey]"
                         class="border-t transition-colors hover:bg-muted/20"
+                        :class="rowClass ? rowClass(row) : ''"
                     >
                         <td
                             v-for="column in columns"
